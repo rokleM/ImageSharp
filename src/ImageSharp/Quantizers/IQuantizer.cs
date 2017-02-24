@@ -5,14 +5,16 @@
 
 namespace ImageSharp.Quantizers
 {
+    using System;
+
+    using ImageSharp.Dithering;
+
     /// <summary>
     /// Provides methods for allowing quantization of images pixels.
     /// </summary>
     /// <typeparam name="TColor">The pixel format.</typeparam>
-    /// <typeparam name="TPacked">The packed format. <example>uint, long, float.</example></typeparam>
-    public interface IQuantizer<TColor, TPacked> : IQuantizer
-        where TColor : struct, IPackedPixel<TPacked>
-        where TPacked : struct
+    public interface IQuantizer<TColor> : IQuantizer
+        where TColor : struct, IPixel<TColor>
     {
         /// <summary>
         /// Quantize an image and return the resulting output pixels.
@@ -22,7 +24,25 @@ namespace ImageSharp.Quantizers
         /// <returns>
         /// A <see cref="T:QuantizedImage"/> representing a quantized version of the image pixels.
         /// </returns>
-        QuantizedImage<TColor, TPacked> Quantize(ImageBase<TColor, TPacked> image, int maxColors);
+        QuantizedImage<TColor> Quantize(ImageBase<TColor> image, int maxColors);
+    }
+
+    /// <summary>
+    /// Provides methods for allowing dithering of quantized image pixels.
+    /// </summary>
+    /// <typeparam name="TColor">The pixel format.</typeparam>
+    public interface IDitheredQuantizer<TColor> : IQuantizer<TColor>
+        where TColor : struct, IPixel<TColor>
+    {
+        /// <summary>
+        /// Gets or sets a value indicating whether to apply dithering to the output image.
+        /// </summary>
+        bool Dither { get; set; }
+
+        /// <summary>
+        /// Gets or sets the dithering algorithm to apply to the output image.
+        /// </summary>
+        IErrorDiffuser DitherType { get; set; }
     }
 
     /// <summary>

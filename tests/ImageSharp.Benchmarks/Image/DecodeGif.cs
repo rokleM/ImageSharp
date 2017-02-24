@@ -13,7 +13,7 @@ namespace ImageSharp.Benchmarks.Image
     using CoreImage = ImageSharp.Image;
     using CoreSize = ImageSharp.Size;
 
-    public class DecodeGif
+    public class DecodeGif : BenchmarkBase
     {
         private byte[] gifBytes;
 
@@ -43,8 +43,10 @@ namespace ImageSharp.Benchmarks.Image
         {
             using (MemoryStream memoryStream = new MemoryStream(this.gifBytes))
             {
-                CoreImage image = new CoreImage(memoryStream);
-                return new CoreSize(image.Width, image.Height);
+                using (CoreImage image = new CoreImage(memoryStream))
+                {
+                    return new CoreSize(image.Width, image.Height);
+                }
             }
         }
     }

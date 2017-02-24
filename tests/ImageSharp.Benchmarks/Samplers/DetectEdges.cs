@@ -10,8 +10,9 @@ namespace ImageSharp.Benchmarks
     using BenchmarkDotNet.Attributes;
 
     using CoreImage = ImageSharp.Image;
+    using Processing;
 
-    public class DetectEdges
+    public class DetectEdges : BenchmarkBase
     {
         private CoreImage image;
 
@@ -25,6 +26,12 @@ namespace ImageSharp.Benchmarks
                     this.image = new CoreImage(stream);
                 }
             }
+        }
+
+        [Cleanup]
+        public void Cleanup()
+        {
+            this.image.Dispose();
         }
 
         [Benchmark(Description = "ImageSharp DetectEdges")]

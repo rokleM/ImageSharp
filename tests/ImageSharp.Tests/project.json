@@ -10,13 +10,44 @@
     ]
   },
   "buildOptions": {
-    "debugType": "portable",
     "allowUnsafe": true
   },
+  "configurations": {
+    "Release": {
+      "buildOptions": {
+        "warningsAsErrors": true
+      }
+    }
+  },
   "dependencies": {
-    "ImageSharp": "1.0.0-*",
+    "ImageSharp": {
+      "target": "project"
+    },
     "xunit": "2.2.0-*",
-    "dotnet-test-xunit": "2.2.0-*"
+    "dotnet-test-xunit": "2.2.0-*",
+    "ImageSharp.Drawing": {
+      "target": "project"
+    },
+    "ImageSharp.Drawing.Paths": {
+      "target": "project"
+    },
+    "ImageSharp.Formats.Png": {
+      "target": "project"
+    },
+    "ImageSharp.Formats.Jpeg": {
+      "target": "project"
+    },
+    "ImageSharp.Formats.Bmp": {
+      "target": "project"
+    },
+    "ImageSharp.Formats.Gif": {
+      "target": "project"
+    },
+    "ImageSharp.Processing": {
+      "target": "project"
+    },
+    //alpha supports netstandard
+    "Moq": "4.6.38-alpha"
   },
   "frameworks": {
     "netcoreapp1.1": {
@@ -24,7 +55,12 @@
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.0.0-*"
-        }
+        },
+        "Microsoft.CodeCoverage": "1.0.2"
+      }
+    },
+    "net451": {
+      "dependencies": {
       }
     }
   },

@@ -7,11 +7,12 @@ namespace ImageSharp
 {
     using System;
     using System.Numerics;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Packed pixel type containing four 16-bit signed integer values.
     /// </summary>
-    public struct Short4 : IPackedPixel<ulong>, IEquatable<Short4>
+    public struct Short4 : IPixel<Short4>, IPackedVector<ulong>
     {
         /// <summary>
         /// The maximum byte value.
@@ -49,7 +50,7 @@ namespace ImageSharp
             this.PackedValue = Pack(x, y, z, w);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public ulong PackedValue { get; set; }
 
         /// <summary>
@@ -64,6 +65,7 @@ namespace ImageSharp
         /// <returns>
         /// True if the <paramref name="left"/> parameter is not equal to the <paramref name="right"/> parameter; otherwise, false.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Short4 left, Short4 right)
         {
             return left.PackedValue == right.PackedValue;
@@ -81,18 +83,21 @@ namespace ImageSharp
         /// <returns>
         /// True if the <paramref name="left"/> parameter is not equal to the <paramref name="right"/> parameter; otherwise, false.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Short4 left, Short4 right)
         {
             return left.PackedValue != right.PackedValue;
         }
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PackFromVector4(Vector4 vector)
         {
             this.PackedValue = Pack(vector.X, vector.Y, vector.Z, vector.W);
         }
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector4 ToVector4()
         {
             return new Vector4(
@@ -103,6 +108,7 @@ namespace ImageSharp
         }
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PackFromBytes(byte x, byte y, byte z, byte w)
         {
             Vector4 vector = new Vector4(x, y, z, w) / 255;
@@ -112,7 +118,8 @@ namespace ImageSharp
         }
 
         /// <inheritdoc />
-        public void ToBytes(byte[] bytes, int startIndex, ComponentOrder componentOrder)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToXyzBytes(byte[] bytes, int startIndex)
         {
             Vector4 vector = this.ToVector4();
             vector /= 65534;
@@ -121,50 +128,69 @@ namespace ImageSharp
             vector += Round;
             vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
 
-            switch (componentOrder)
-            {
-                case ComponentOrder.ZYX:
-                    bytes[startIndex] = (byte)(float)Math.Round(vector.Z);
-                    bytes[startIndex + 1] = (byte)(float)Math.Round(vector.Y);
-                    bytes[startIndex + 2] = (byte)(float)Math.Round(vector.X);
-                    break;
-                case ComponentOrder.ZYXW:
-                    bytes[startIndex] = (byte)(float)Math.Round(vector.Z);
-                    bytes[startIndex + 1] = (byte)(float)Math.Round(vector.Y);
-                    bytes[startIndex + 2] = (byte)(float)Math.Round(vector.X);
-                    bytes[startIndex + 3] = (byte)(float)Math.Round(vector.W);
-                    break;
-                case ComponentOrder.XYZ:
-                    bytes[startIndex] = (byte)(float)Math.Round(vector.X);
-                    bytes[startIndex + 1] = (byte)(float)Math.Round(vector.Y);
-                    bytes[startIndex + 2] = (byte)(float)Math.Round(vector.Z);
-                    break;
-                case ComponentOrder.XYZW:
-                    bytes[startIndex] = (byte)(float)Math.Round(vector.X);
-                    bytes[startIndex + 1] = (byte)(float)Math.Round(vector.Y);
-                    bytes[startIndex + 2] = (byte)(float)Math.Round(vector.Z);
-                    bytes[startIndex + 3] = (byte)(float)Math.Round(vector.W);
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            bytes[startIndex] = (byte)(float)Math.Round(vector.X);
+            bytes[startIndex + 1] = (byte)(float)Math.Round(vector.Y);
+            bytes[startIndex + 2] = (byte)(float)Math.Round(vector.Z);
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to a specified object.
-        /// </summary>
-        /// <param name="obj">The object with which to make the comparison.</param>
-        /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToXyzwBytes(byte[] bytes, int startIndex)
+        {
+            Vector4 vector = this.ToVector4();
+            vector /= 65534;
+            vector *= 255;
+            vector += Half;
+            vector += Round;
+            vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
+
+            bytes[startIndex] = (byte)(float)Math.Round(vector.X);
+            bytes[startIndex + 1] = (byte)(float)Math.Round(vector.Y);
+            bytes[startIndex + 2] = (byte)(float)Math.Round(vector.Z);
+            bytes[startIndex + 3] = (byte)(float)Math.Round(vector.W);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToZyxBytes(byte[] bytes, int startIndex)
+        {
+            Vector4 vector = this.ToVector4();
+            vector /= 65534;
+            vector *= 255;
+            vector += Half;
+            vector += Round;
+            vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
+
+            bytes[startIndex] = (byte)(float)Math.Round(vector.Z);
+            bytes[startIndex + 1] = (byte)(float)Math.Round(vector.Y);
+            bytes[startIndex + 2] = (byte)(float)Math.Round(vector.X);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToZyxwBytes(byte[] bytes, int startIndex)
+        {
+            Vector4 vector = this.ToVector4();
+            vector /= 65534;
+            vector *= 255;
+            vector += Half;
+            vector += Round;
+            vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
+
+            bytes[startIndex] = (byte)(float)Math.Round(vector.Z);
+            bytes[startIndex + 1] = (byte)(float)Math.Round(vector.Y);
+            bytes[startIndex + 2] = (byte)(float)Math.Round(vector.X);
+            bytes[startIndex + 3] = (byte)(float)Math.Round(vector.W);
+        }
+
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return (obj is Short4) && this == (Short4)obj;
         }
 
-        /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to a specified object.
-        /// </summary>
-        /// <param name="other">The object with which to make the comparison.</param>
-        /// <returns>true if the current instance is equal to the specified object; false otherwise.</returns>
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Short4 other)
         {
             return this == other;
@@ -174,6 +200,7 @@ namespace ImageSharp
         /// Gets the hash code for the current instance.
         /// </summary>
         /// <returns>Hash code for the instance.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
         {
             return this.PackedValue.GetHashCode();
@@ -196,6 +223,7 @@ namespace ImageSharp
         /// <param name="z">The z-component</param>
         /// <param name="w">The w-component</param>
         /// <returns>The <see cref="ulong"/> containing the packed values.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ulong Pack(float x, float y, float z, float w)
         {
             // Largest two byte positive number 0xFFFF >> 1;

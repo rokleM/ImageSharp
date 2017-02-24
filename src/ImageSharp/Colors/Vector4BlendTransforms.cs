@@ -15,11 +15,6 @@ namespace ImageSharp
     public class Vector4BlendTransforms
     {
         /// <summary>
-        /// The epsilon for comparing floating point numbers.
-        /// </summary>
-        private const float Epsilon = 0.0001F;
-
-        /// <summary>
         /// The blending formula simply selects the source vector.
         /// </summary>
         /// <param name="backdrop">The backdrop vector.</param>
@@ -186,7 +181,7 @@ namespace ImageSharp
         }
 
         /// <summary>
-        /// Linearly interpolates from one vector to another based on the given weighting. 
+        /// Linearly interpolates from one vector to another based on the given weighting.
         /// The two vectors are premultiplied before operating.
         /// </summary>
         /// <param name="backdrop">The backdrop vector.</param>
@@ -195,7 +190,7 @@ namespace ImageSharp
         /// A value between 0 and 1 indicating the weight of the second source vector.
         /// At amount = 0, "from" is returned, at amount = 1, "to" is returned.
         /// </param>
-        /// <returns> 
+        /// <returns>
         /// The <see cref="Vector4"/>
         /// </returns>
         public static Vector4 PremultipliedLerp(Vector4 backdrop, Vector4 source, float amount)
@@ -203,20 +198,20 @@ namespace ImageSharp
             amount = amount.Clamp(0, 1);
 
             // Santize on zero alpha
-            if (Math.Abs(backdrop.W) < Epsilon)
+            if (Math.Abs(backdrop.W) < Constants.Epsilon)
             {
                 source.W *= amount;
                 return source;
             }
 
-            if (Math.Abs(source.W) < Epsilon)
+            if (Math.Abs(source.W) < Constants.Epsilon)
             {
                 return backdrop;
             }
 
             // Premultiply the source vector.
             // Oddly premultiplying the background vector creates dark outlines when pixels
-            // Have low alpha values. 
+            // Have low alpha values.
             source = new Vector4(source.X, source.Y, source.Z, 1) * (source.W * amount);
 
             // This should be implementing the following formula
@@ -266,7 +261,7 @@ namespace ImageSharp
         /// </returns>
         private static float BlendDodge(float b, float s)
         {
-            return Math.Abs(s - 1F) < Epsilon ? s : Math.Min(b / (1F - s), 1F);
+            return Math.Abs(s - 1F) < Constants.Epsilon ? s : Math.Min(b / (1F - s), 1F);
         }
 
         /// <summary>
@@ -279,7 +274,7 @@ namespace ImageSharp
         /// </returns>
         private static float BlendBurn(float b, float s)
         {
-            return Math.Abs(s) < Epsilon ? s : Math.Max(1F - ((1F - b) / s), 0F);
+            return Math.Abs(s) < Constants.Epsilon ? s : Math.Max(1F - ((1F - b) / s), 0F);
         }
 
         /// <summary>

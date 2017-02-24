@@ -7,6 +7,7 @@ namespace ImageSharp
 {
     using System;
     using System.Numerics;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Packed pixel type containing four 8-bit unsigned normalized values ranging from 0 to 255.
@@ -16,7 +17,7 @@ namespace ImageSharp
     /// This struct is fully mutable. This is done (against the guidelines) for the sake of performance,
     /// as it avoids the need to create new values for modification operations.
     /// </remarks>
-    public struct Argb : IPackedPixel<uint>, IEquatable<Argb>
+    public struct Argb : IPixel<Argb>, IPackedVector<uint>
     {
         /// <summary>
         /// The shift count for the blue component
@@ -113,11 +114,13 @@ namespace ImageSharp
         /// </summary>
         public byte R
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 return (byte)(this.PackedValue >> RedShift);
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 this.PackedValue = this.PackedValue & 0xFF00FFFF | (uint)value << RedShift;
@@ -129,11 +132,13 @@ namespace ImageSharp
         /// </summary>
         public byte G
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 return (byte)(this.PackedValue >> GreenShift);
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 this.PackedValue = this.PackedValue & 0xFFFF00FF | (uint)value << GreenShift;
@@ -145,11 +150,13 @@ namespace ImageSharp
         /// </summary>
         public byte B
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 return (byte)(this.PackedValue >> BlueShift);
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 this.PackedValue = this.PackedValue & 0xFFFFFF00 | (uint)value << BlueShift;
@@ -161,11 +168,13 @@ namespace ImageSharp
         /// </summary>
         public byte A
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 return (byte)(this.PackedValue >> AlphaShift);
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 this.PackedValue = this.PackedValue & 0x00FFFFFF | (uint)value << AlphaShift;
@@ -184,6 +193,7 @@ namespace ImageSharp
         /// <returns>
         /// True if the <paramref name="left"/> parameter is equal to the <paramref name="right"/> parameter; otherwise, false.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Argb left, Argb right)
         {
             return left.PackedValue == right.PackedValue;
@@ -197,59 +207,69 @@ namespace ImageSharp
         /// <returns>
         /// True if the <paramref name="left"/> parameter is not equal to the <paramref name="right"/> parameter; otherwise, false.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Argb left, Argb right)
         {
             return left.PackedValue != right.PackedValue;
         }
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PackFromVector4(Vector4 vector)
         {
             this.PackedValue = Pack(ref vector);
         }
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector4 ToVector4()
         {
             return new Vector4(this.R, this.G, this.B, this.A) / MaxBytes;
         }
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PackFromBytes(byte x, byte y, byte z, byte w)
         {
             this.PackedValue = Pack(x, y, z, w);
         }
 
-        /// <inheritdoc/>
-        public void ToBytes(byte[] bytes, int startIndex, ComponentOrder componentOrder)
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToXyzBytes(byte[] bytes, int startIndex)
         {
-            switch (componentOrder)
-            {
-                case ComponentOrder.ZYX:
-                    bytes[startIndex] = this.B;
-                    bytes[startIndex + 1] = this.G;
-                    bytes[startIndex + 2] = this.R;
-                    break;
-                case ComponentOrder.ZYXW:
-                    bytes[startIndex] = this.B;
-                    bytes[startIndex + 1] = this.G;
-                    bytes[startIndex + 2] = this.R;
-                    bytes[startIndex + 3] = this.A;
-                    break;
-                case ComponentOrder.XYZ:
-                    bytes[startIndex] = this.R;
-                    bytes[startIndex + 1] = this.G;
-                    bytes[startIndex + 2] = this.B;
-                    break;
-                case ComponentOrder.XYZW:
-                    bytes[startIndex] = this.R;
-                    bytes[startIndex + 1] = this.G;
-                    bytes[startIndex + 2] = this.B;
-                    bytes[startIndex + 3] = this.A;
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            bytes[startIndex] = this.R;
+            bytes[startIndex + 1] = this.G;
+            bytes[startIndex + 2] = this.B;
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToXyzwBytes(byte[] bytes, int startIndex)
+        {
+            bytes[startIndex] = this.R;
+            bytes[startIndex + 1] = this.G;
+            bytes[startIndex + 2] = this.B;
+            bytes[startIndex + 3] = this.A;
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToZyxBytes(byte[] bytes, int startIndex)
+        {
+            bytes[startIndex] = this.B;
+            bytes[startIndex + 1] = this.G;
+            bytes[startIndex + 2] = this.R;
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToZyxwBytes(byte[] bytes, int startIndex)
+        {
+            bytes[startIndex] = this.B;
+            bytes[startIndex + 1] = this.G;
+            bytes[startIndex + 2] = this.R;
+            bytes[startIndex + 3] = this.A;
         }
 
         /// <inheritdoc/>
@@ -259,12 +279,14 @@ namespace ImageSharp
         }
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Argb other)
         {
             return this.PackedValue == other.PackedValue;
         }
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
         {
             // ReSharper disable once NonReadonlyMemberInGetHashCode
@@ -279,6 +301,7 @@ namespace ImageSharp
         /// <param name="z">The z-component</param>
         /// <param name="w">The w-component</param>
         /// <returns>The <see cref="uint"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint Pack(float x, float y, float z, float w)
         {
             var value = new Vector4(x, y, z, w);
@@ -293,6 +316,7 @@ namespace ImageSharp
         /// <param name="z">The z-component</param>
         /// <param name="w">The w-component</param>
         /// <returns>The <see cref="uint"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint Pack(byte x, byte y, byte z, byte w)
         {
             return (uint)(x << RedShift | y << GreenShift | z << BlueShift | w << AlphaShift);
@@ -303,6 +327,7 @@ namespace ImageSharp
         /// </summary>
         /// <param name="vector">The vector containing the values to pack.</param>
         /// <returns>The <see cref="uint"/> containing the packed values.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint Pack(ref Vector3 vector)
         {
             var value = new Vector4(vector, 1);
@@ -314,11 +339,12 @@ namespace ImageSharp
         /// </summary>
         /// <param name="vector">The vector containing the values to pack.</param>
         /// <returns>The <see cref="uint"/> containing the packed values.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint Pack(ref Vector4 vector)
         {
-            vector = Vector4.Clamp(vector, Vector4.Zero, Vector4.One);
             vector *= MaxBytes;
             vector += Half;
+            vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
             return (uint)(((byte)vector.X << RedShift)
                         | ((byte)vector.Y << GreenShift)
                         | ((byte)vector.Z << BlueShift)

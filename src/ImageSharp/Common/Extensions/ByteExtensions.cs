@@ -5,7 +5,7 @@
 
 namespace ImageSharp
 {
-    using System;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Extension methods for the <see cref="byte"/> struct.
@@ -28,6 +28,7 @@ namespace ImageSharp
         /// <param name="index">The index.</param>
         /// <param name="length">The length.</param>
         /// <exception cref="System.ArgumentNullException"><paramref name="source"/> is null.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ReverseBytes(this byte[] source, int index, int length)
         {
             Guard.NotNull(source, nameof(source));

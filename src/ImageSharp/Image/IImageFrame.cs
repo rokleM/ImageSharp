@@ -6,13 +6,13 @@
 namespace ImageSharp
 {
     /// <summary>
-    /// Represents a single frame in a animation.
+    /// Encapsulates the basic properties and methods required to manipulate images.
     /// </summary>
-    /// <typeparam name="TColor">The pixel format.</typeparam>
-    /// <typeparam name="TPacked">The packed format. <example>uint, long, float.</example></typeparam>
-    public interface IImageFrame<TColor, TPacked> : IImageBase<TColor, TPacked>
-        where TColor : struct, IPackedPixel<TPacked>
-        where TPacked : struct
+    internal interface IImageFrame : IImageBase
     {
+        /// <summary>
+        /// Gets the meta data of the image.
+        /// </summary>
+        ImageFrameMetaData MetaData { get; }
     }
 }

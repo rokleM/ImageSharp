@@ -7,11 +7,12 @@ namespace ImageSharp
 {
     using System;
     using System.Numerics;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Packed pixel type containing a single 16 bit floating point value.
     /// </summary>
-    public struct HalfSingle : IPackedPixel<ushort>, IEquatable<HalfSingle>
+    public struct HalfSingle : IPixel<HalfSingle>, IPackedVector<ushort>
     {
         /// <summary>
         /// The maximum byte value.
@@ -32,7 +33,7 @@ namespace ImageSharp
             this.PackedValue = HalfTypeHelper.Pack(single);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public ushort PackedValue { get; set; }
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace ImageSharp
         /// <returns>
         /// True if the <paramref name="left"/> parameter is equal to the <paramref name="right"/> parameter; otherwise, false.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(HalfSingle left, HalfSingle right)
         {
             return left.PackedValue == right.PackedValue;
@@ -64,6 +66,7 @@ namespace ImageSharp
         /// <returns>
         /// True if the <paramref name="left"/> parameter is not equal to the <paramref name="right"/> parameter; otherwise, false.
         /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(HalfSingle left, HalfSingle right)
         {
             return left.PackedValue != right.PackedValue;
@@ -73,64 +76,89 @@ namespace ImageSharp
         /// Expands the packed representation into a <see cref="float"/>.
         /// </summary>
         /// <returns>The <see cref="float"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float ToSingle()
         {
             return HalfTypeHelper.Unpack(this.PackedValue);
         }
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PackFromVector4(Vector4 vector)
         {
             this.PackedValue = HalfTypeHelper.Pack(vector.X);
         }
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector4 ToVector4()
         {
             return new Vector4(this.ToSingle(), 0, 0, 1);
         }
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PackFromBytes(byte x, byte y, byte z, byte w)
         {
             this.PackFromVector4(new Vector4(x, y, z, w) / MaxBytes);
         }
 
         /// <inheritdoc />
-        public void ToBytes(byte[] bytes, int startIndex, ComponentOrder componentOrder)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToXyzBytes(byte[] bytes, int startIndex)
         {
             Vector4 vector = this.ToVector4();
             vector *= MaxBytes;
             vector += Half;
             vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
 
-            switch (componentOrder)
-            {
-                case ComponentOrder.ZYX:
-                    bytes[startIndex] = (byte)vector.Z;
-                    bytes[startIndex + 1] = (byte)vector.Y;
-                    bytes[startIndex + 2] = (byte)vector.X;
-                    break;
-                case ComponentOrder.ZYXW:
-                    bytes[startIndex] = (byte)vector.Z;
-                    bytes[startIndex + 1] = (byte)vector.Y;
-                    bytes[startIndex + 2] = (byte)vector.X;
-                    bytes[startIndex + 3] = (byte)vector.W;
-                    break;
-                case ComponentOrder.XYZ:
-                    bytes[startIndex] = (byte)vector.X;
-                    bytes[startIndex + 1] = (byte)vector.Y;
-                    bytes[startIndex + 2] = (byte)vector.Z;
-                    break;
-                case ComponentOrder.XYZW:
-                    bytes[startIndex] = (byte)vector.X;
-                    bytes[startIndex + 1] = (byte)vector.Y;
-                    bytes[startIndex + 2] = (byte)vector.Z;
-                    bytes[startIndex + 3] = (byte)vector.W;
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            bytes[startIndex] = (byte)vector.X;
+            bytes[startIndex + 1] = (byte)vector.Y;
+            bytes[startIndex + 2] = (byte)vector.Z;
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToXyzwBytes(byte[] bytes, int startIndex)
+        {
+            Vector4 vector = this.ToVector4();
+            vector *= MaxBytes;
+            vector += Half;
+            vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
+
+            bytes[startIndex] = (byte)vector.X;
+            bytes[startIndex + 1] = (byte)vector.Y;
+            bytes[startIndex + 2] = (byte)vector.Z;
+            bytes[startIndex + 3] = (byte)vector.W;
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToZyxBytes(byte[] bytes, int startIndex)
+        {
+            Vector4 vector = this.ToVector4();
+            vector *= MaxBytes;
+            vector += Half;
+            vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
+
+            bytes[startIndex] = (byte)vector.Z;
+            bytes[startIndex + 1] = (byte)vector.Y;
+            bytes[startIndex + 2] = (byte)vector.X;
+        }
+
+        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ToZyxwBytes(byte[] bytes, int startIndex)
+        {
+            Vector4 vector = this.ToVector4();
+            vector *= MaxBytes;
+            vector += Half;
+            vector = Vector4.Clamp(vector, Vector4.Zero, MaxBytes);
+
+            bytes[startIndex] = (byte)vector.Z;
+            bytes[startIndex + 1] = (byte)vector.Y;
+            bytes[startIndex + 2] = (byte)vector.X;
+            bytes[startIndex + 3] = (byte)vector.W;
         }
 
         /// <inheritdoc />
@@ -140,6 +168,7 @@ namespace ImageSharp
         }
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(HalfSingle other)
         {
             return this.PackedValue == other.PackedValue;
@@ -152,6 +181,7 @@ namespace ImageSharp
         }
 
         /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
         {
             return this.PackedValue.GetHashCode();

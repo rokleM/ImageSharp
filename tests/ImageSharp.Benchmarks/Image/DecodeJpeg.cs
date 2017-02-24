@@ -13,7 +13,7 @@ namespace ImageSharp.Benchmarks.Image
     using CoreImage = ImageSharp.Image;
     using CoreSize = ImageSharp.Size;
 
-    public class DecodeJpeg
+    public class DecodeJpeg : BenchmarkBase
     {
         private byte[] jpegBytes;
 
@@ -22,7 +22,7 @@ namespace ImageSharp.Benchmarks.Image
         {
             if (this.jpegBytes == null)
             {
-                this.jpegBytes = File.ReadAllBytes("../ImageSharp.Tests/TestImages/Formats/Jpg/Calliphora.jpg");
+                this.jpegBytes = File.ReadAllBytes("../ImageSharp.Tests/TestImages/Formats/Jpg/Baseline/Calliphora.jpg");
             }
         }
 
@@ -43,8 +43,10 @@ namespace ImageSharp.Benchmarks.Image
         {
             using (MemoryStream memoryStream = new MemoryStream(this.jpegBytes))
             {
-                CoreImage image = new CoreImage(memoryStream);
-                return new CoreSize(image.Width, image.Height);
+                using (CoreImage image = new CoreImage(memoryStream))
+                {
+                    return new CoreSize(image.Width, image.Height);
+                }
             }
         }
     }

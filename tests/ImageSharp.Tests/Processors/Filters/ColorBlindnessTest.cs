@@ -5,6 +5,7 @@
 
 namespace ImageSharp.Tests
 {
+    using Processing;
     using System.IO;
 
     using Xunit;
@@ -25,20 +26,18 @@ namespace ImageSharp.Tests
         };
 
         [Theory]
-        [MemberData("ColorBlindnessFilters")]
+        [MemberData(nameof(ColorBlindnessFilters))]
         public void ImageShouldApplyColorBlindnessFilter(ColorBlindness colorBlindness)
         {
-            string path = CreateOutputDirectory("ColorBlindness");
+            string path = this.CreateOutputDirectory("ColorBlindness");
 
             foreach (TestFile file in Files)
             {
                 string filename = file.GetFileName(colorBlindness);
-                Image image = file.CreateImage();
-
+                using (Image image = file.CreateImage())
                 using (FileStream output = File.OpenWrite($"{path}/{filename}"))
                 {
-                    image.ColorBlindness(colorBlindness)
-                          .Save(output);
+                    image.ColorBlindness(colorBlindness).Save(output);
                 }
             }
         }

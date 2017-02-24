@@ -15,13 +15,36 @@
   },
   "dependencies": {
     "BenchmarkDotNet.Diagnostics.Windows": "0.10.1",
-    "ImageSharp": "1.0.0-*"
+    "ImageSharp": {
+      "target": "project"
+    },
+    "ImageSharp.Drawing": {
+      "target": "project"
+    },
+    "ImageSharp.Drawing.Paths": {
+      "target": "project"
+    },
+    "ImageSharp.Formats.Jpeg": {
+      "target": "project"
+    },
+    "ImageSharp.Formats.Png": {
+      "target": "project"
+    },
+    "ImageSharp.Formats.Bmp": {
+      "target": "project"
+    },
+    "ImageSharp.Formats.Gif": {
+      "target": "project"
+    },
+    "ImageSharp.Processing": {
+      "target": "project"
+    }
   },
   "commands": {
     "ImageSharp.Benchmarks": "ImageSharp.Benchmarks"
   },
   "frameworks": {
-    "net461": {
+    "net46": {
       "dependencies": {
       },
       "frameworkAssemblies": {

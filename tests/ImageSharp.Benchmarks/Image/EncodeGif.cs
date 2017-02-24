@@ -12,7 +12,7 @@ namespace ImageSharp.Benchmarks.Image
     using BenchmarkDotNet.Attributes;
     using CoreImage = ImageSharp.Image;
 
-    public class EncodeGif
+    public class EncodeGif : BenchmarkBase
     {
         // System.Drawing needs this.
         private Stream bmpStream;
@@ -29,6 +29,14 @@ namespace ImageSharp.Benchmarks.Image
                 this.bmpStream.Position = 0;
                 this.bmpDrawing = Image.FromStream(this.bmpStream);
             }
+        }
+
+        [Cleanup]
+        public void Cleanup()
+        {
+            this.bmpStream.Dispose();
+            this.bmpCore.Dispose();
+            this.bmpDrawing.Dispose();
         }
 
         [Benchmark(Baseline = true, Description = "System.Drawing Gif")]
